@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 需要启动的服务器列表 -->
+    <bean id="serverMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map key-type="java.lang.String" value-type="com.chh.ap.cs.server.Server">
+                <entry key="OBD盒子TCP连接服务器" value-ref="minaSocketServer"/>
+                <entry key="推送消息服务" value-ref="pushManager"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    <!-- 服务重启断链接丢失处理-->
+    <bean id="warningRemedyManager" class="com.chh.ap.cs.client.WarningRemedyManager">
+    	 <property name="taskMap">
+            <map key-type="java.lang.String" value-type="java.lang.Runnable">
+                <entry key="HTWX断链接报警重启服务器丢失处理" value-ref="htwxlostWarningRemedyTask"/>
+                <entry key="DNA断链接报警重启服务器丢失处理" value-ref="dnaLostWarningRemedyTask"/>
+                <entry key="CNLAUNCH断链接报警重启服务器丢失处理" value-ref="cnlaunchLostWarningRemedyTask"/>
+                <entry key="HTWX失联报警重启服务器丢失处理" value-ref="htwxMissWarningRemedyTask"/>
+                <entry key="DNA失联报警重启服务器丢失处理" value-ref="dnaMissWarningRemedyTask"/>
+                <entry key="CNLAUNCH失联报警重启服务器丢失处理" value-ref="cnlaunchMissWarningRemedyTask"/>
+                
+            </map>
+        </property>
+    </bean>
+    
+    
+    <!--YZ断链接报警重启服务器丢失处理  -->
+    <bean id="cnlaunchLostWarningRemedyTask" class="com.chh.ap.cs.client.LostWarningRemedyTask">
+        <property name="clientTypeId" value="1"/>
+        <property name="sessionTime" value="300"/>
+        <property name="sessionCodeMapFixCache" ref="sessionCodeMapFixCache"/>
+        <property name="notificationCache" ref="notificationStackCache"/>
+    </bean>
+    
+    <bean id="htwxlostWarningRemedyTask" class="com.chh.ap.cs.client.LostWarningRemedyTask">
+        <property name="clientTypeId" value="3"/>
+        <property name="sessionTime" value="300"/>
+        <property name="sessionCodeMapFixCache" ref="sessionCodeMapFixCache"/>
+        <property name="notificationCache" ref="notificationStackCache"/>
+    </bean>
+    <bean id="dnaLostWarningRemedyTask" class="com.chh.ap.cs.client.LostWarningRemedyTask">
+   		<property name="clientTypeId" value="2"/>
+        <property name="sessionTime" value="180"/>
+        <property name="sessionCodeMapFixCache" ref="sessionCodeMapFixCache"/>
+        <property name="notificationCache" ref="notificationStackCache"/>
+    </bean>
+    <bean id="htwxMissWarningRemedyTask" class="com.chh.ap.cs.client.MissWarningRemedyTask">
+        <property name="clientTypeId" value="3"/>
+        <property name="deviceSnExpireCache" ref="deviceSnExpireCache"/>
+        <property name="deviceSnExpireFixCache" ref="deviceSnExpireFixCache"/>
+        <property name="alarmExporter" ref="notificationStackCache" />
+    </bean>
+    <bean id="dnaMissWarningRemedyTask" class="com.chh.ap.cs.client.MissWarningRemedyTask">
+        <property name="clientTypeId" value="2"/>
+        <property name="deviceSnExpireCache" ref="deviceSnExpireCache"/>
+        <property name="deviceSnExpireFixCache" ref="deviceSnExpireFixCache"/>
+        <property name="alarmExporter" ref="notificationStackCache" />
+    </bean>
+    <!--YZ失联报警重启服务器丢失处理  -->
+    <bean id="cnlaunchMissWarningRemedyTask" class="com.chh.ap.cs.client.MissWarningRemedyTask">
+        <property name="clientTypeId" value="1"/>
+        <property name="deviceSnExpireCache" ref="deviceSnExpireCache"/>
+        <property name="deviceSnExpireFixCache" ref="deviceSnExpireFixCache"/>
+        <property name="alarmExporter" ref="notificationStackCache" />
+    </bean>
+    
+    <!-- 服务重启，断链接丢失处理 -->
+    <bean id="missWarningRemedyTask" class="com.chh.ap.cs.client.MissWarningRemedyTask">
+    </bean>
+    
+    <bean id="pushManager" class="com.chh.ap.cs.push.PushManager">
+    </bean>
+
+    <bean id="minaSocketServer" class="com.chh.ap.cs.server.tcp.MinaSocketServer" scope="singleton">
+        <property name="port" value="3088"/>
+        <property name="sessionTime" value="180"/>
+        <property name="clientRecognizer" ref="clientRecognizer"/>
+        <property name="clientTypeMap">
+            <map key-type="java.lang.Integer" value-type="com.chh.ap.cs.client.ClientType">
+                <entry key="1" value-ref="clientCnLauncID"/> <!--obd 终端类型 元征  -->
+                <entry key="2" value-ref="clientDnaGID"/> <!-- obd 终端类型  迪纳 -->
+                <entry key="3" value-ref="clientHtwxObd"/> <!-- obd 终端类型  航天无线 -->
+            </map>
+        </property>
+    </bean>
+
+    <bean id="sessionMonitor" class="com.chh.ap.cs.client.SessionMonitor">
+        <property name="alarmExporter" ref="notificationStackCache" />
+        <property name="redisDbIndex" value="1"/>
+        <property name="jedisFactory" ref="jedisFactory"/>
+        <property name="deviceSnExpireFixCache" ref="deviceSnExpireFixCache"/>
+    </bean>
+
+    <bean id="ioHandler" class="com.chh.ap.cs.handler.DefaultIoHandler">
+        <property name="upDataCache" ref="upDataStackCache"></property>
+        <property name="notificationCache" ref="notificationStackCache"></property>
+    </bean>
+
+    <bean id="clientRecognizer" class="com.chh.ap.cs.handler.ClientRecognizerImpl"/>
+
+    <bean id="clientCnLauncID" class="com.chh.ap.cs.client.ClientType">
+        <property name="type" value="1"/>
+        <property name="sessionIdle" value="180"/>
+        <!--TODO 配置 元征协议解析类  cnlaunchOBD2ProtocolHandler -->
+        <property name="protocolHandler" ref="cnlaunchOBD2ProtocolHandler"/>
+    </bean>
+    
+    <bean id="cnlaunchOBD2ProtocolHandler" class="com.chh.ap.cs.client.protocol.cnlaunch.CnLaunchObdProtocolHandler"/>
+
+    <bean id="clientDnaGID" class="com.chh.ap.cs.client.ClientType">
+        <property name="type" value="2"/>
+        <property name="sessionIdle" value="180"/>
+        <property name="protocolHandler" ref="dnaGIDProtocolHandler"/>
+    </bean>
+
+    <bean id="dnaGIDProtocolHandler" class="com.chh.ap.cs.client.protocol.dna.DnaGIDProtocolHandler"/>
+
+    <bean id="clientHtwxObd" class="com.chh.ap.cs.client.ClientType">
+        <property name="type" value="3"/>
+        <property name="sessionIdle" value="180"/>
+        <property name="protocolHandler" ref="htwxOBD2ProtocolHandler"/>
+    </bean>
+    <bean id="htwxOBD2ProtocolHandler" class="com.chh.ap.cs.client.protocol.htwx.HtwxOBD2ProtocolHandler"/>
+
+    <bean id="upDataCache" class="com.chh.ap.cs.util.cache.redis.RedisCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="upDataCache"/>
+    </bean>
+    <bean id="upDataStackCache" class="com.chh.ap.cs.util.cache.redis.RedisStackCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="upDataStackCache"/>
+    </bean>
+    <bean id="notificationStackCache" class="com.chh.ap.cs.util.cache.redis.RedisStackCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="notificationStackCache"/>
+    </bean>
+
+    <bean id="sessionCodeMapCache" class="com.chh.ap.cs.util.cache.redis.RedisCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="sessionCodeMapCache"/>
+    </bean>
+    
+    <bean id="sessionCodeMapFixCache" class="com.chh.ap.cs.util.cache.redis.RedisHashCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="sessionCodeMapFixCache"/>
+    </bean>
+
+    <bean id="sessionMapByIdCache" class="com.chh.ap.cs.util.cache.redis.RedisCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="sessionMapByIdCache"/>
+    </bean>
+    
+  
+    <bean id="deviceSnExpireCache" class="com.chh.ap.cs.util.cache.redis.RedisCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="deviceSnExpireCache"/>
+        <property name="dbIndex" value="1"/>
+        <property name="maxLifetime" value="43200000"/>
+    </bean>
+    
+    <bean id="deviceSnExpireFixCache" class="com.chh.ap.cs.util.cache.redis.RedisHashCache">
+        <constructor-arg>
+            <ref bean="jedisFactory"/>
+        </constructor-arg>
+        <property name="name" value="deviceSnExpireFixCache"/>
+    </bean>
+
+    <bean id="jedisFactory" class="com.chh.ap.cs.util.cache.redis.JedisFactory" init-method="initPool"
+          scope="singleton">
+        <property name="host" value="localhost"/>
+        <property name="port" value="6379"/>
+        <property name="timeout" value="1000"/>
+        <property name="maxWaitMills" value="10000"/>
+        <property name="maxTotal" value="300"/>
+        <property name="maxIdle" value="50"/>
+        <!-- <property name="password" value=""/> -->
+        <property name="maxActive" value="300"/>
+        <property name="leftMaxTime" value="0"/>
+        <property name="enRedisable" value="true"/>
+    </bean>
+</beans>

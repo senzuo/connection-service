@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+  <appender name="ServerDailyRollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
+    <!--for further documentation-->
+    <Append>true</Append>
+    <File>logs/conServer.log</File>
+    <encoder>
+      <!-- <pattern>%d - %m%n</pattern> -->
+      <pattern>[%p][%d{yyyy-MM-dd HH:mm:ss.SSS}][%c]%m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/conServer.log.%d{yyyy-MM-dd }</fileNamePattern>
+    </rollingPolicy>
+  </appender>  
+  <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>[%p][%d{yyyy-MM-dd HH:mm:ss.SSS}][%c]%m%n</pattern>
+    </encoder>
+  </appender>
+  
+  <appender name="A2" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
+    <!--for further documentation-->
+    <File>logs/log4data.log</File>
+    <encoder>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}]%m%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/log4data.log.%d{yyyy-MM-dd }</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+  <logger name="log4data" level="info">
+    <appender-ref ref="A2"/>
+  </logger>
+  
+  <root level="debug">
+    <appender-ref ref="ServerDailyRollingFile"/>
+    <appender-ref ref="stdout"/>
+  </root>
+</configuration>
