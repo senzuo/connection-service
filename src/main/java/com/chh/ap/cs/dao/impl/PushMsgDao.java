@@ -9,6 +9,7 @@ import java.util.List;
 import com.chh.ap.cs.dao.BaseDao;
 import com.chh.ap.cs.dao.IPushMsgDao;
 import com.chh.ap.cs.push.PushMsg;
+import com.chh.ap.cs.util.DBUtil;
 
 public class PushMsgDao extends BaseDao implements IPushMsgDao {
 
@@ -48,11 +49,10 @@ public class PushMsgDao extends BaseDao implements IPushMsgDao {
 		}catch(Exception e){			
 			throw e;
 		}finally{
-			close(null,updatePs);
-			close(rs, selectPs);
-			close(null,cpHisPs);
-			close(null,delPs);
-			closeConnection();
+			DBUtil.close(null, updatePs, null);
+			DBUtil.close(rs, selectPs, null);
+			DBUtil.close(null, cpHisPs, null);
+			DBUtil.close(null, delPs, con);
 		}
 		return res;
 	}

@@ -161,6 +161,8 @@ public class SessionManager {
             //计数-1
 //			ClientType.decrement(sessInfo.getClientType());
             sessInfo.clientType.decrement();
+
+
         }
     }
 
@@ -168,6 +170,10 @@ public class SessionManager {
      * session信息
      */
     public static class SessionInfo {
+
+        public static final int STATUS_ONLINE = 1;
+
+        public static final int STATUS_LOST = 2;
 
         private String id;
 

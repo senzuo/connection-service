@@ -7,6 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.chh.ap.cs.client.ClientType;
 import com.chh.ap.cs.client.SessionManager;
+import com.chh.ap.cs.dao.impl.PushMsgDao;
 import com.chh.ap.cs.server.Server;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public class PushManager implements Server {
     private Condition full = lock.newCondition();
     
     private PushThread pushThread;
+
+    private PushMsgDao pushMsgDao;
 	
     @Override
     public void start()  throws Exception {
@@ -148,4 +151,12 @@ public class PushManager implements Server {
 		// TODO Auto-generated method stub
 		
 	}
+
+    public PushMsgDao getPushMsgDao() {
+        return pushMsgDao;
+    }
+
+    public void setPushMsgDao(PushMsgDao pushMsgDao) {
+        this.pushMsgDao = pushMsgDao;
+    }
 }

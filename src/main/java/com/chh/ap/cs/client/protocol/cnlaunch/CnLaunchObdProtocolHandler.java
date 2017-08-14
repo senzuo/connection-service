@@ -51,7 +51,7 @@ public class CnLaunchObdProtocolHandler implements ProtocolHandler {
 		reqAndRespMap.put(0x0009, PROTOCOL_TYPE_PACK_RESP);//打包业务                                     
 	}
 	
-	private DeviceDao deviceDao = new DeviceDao();
+	private DeviceDao deviceDao;
 	
 	@Override
 	public MessageDecoderResult decodable(byte[] srcdata) {
@@ -214,7 +214,7 @@ public class CnLaunchObdProtocolHandler implements ProtocolHandler {
 		//String deviceId = ByteArrayUtil.byte2str(message, CnLaunchPacket.INDEX_OF_OBD_SN, 24);
 		SessionManager.SessionInfo sess = null;
 		try {
-			sess = deviceDao.login(sn, ClientType.CLIENT_TYPE_OBD_YUANZHEN);
+			sess = deviceDao.login(sn);
 			if(sess==null) {
 				log.info("设备[ID:{}]未入库，登录失败。",sn);
 			}
@@ -388,5 +388,13 @@ public class CnLaunchObdProtocolHandler implements ProtocolHandler {
 			//日志上传调试 sql
 			//	INSERT INTO `t_device_push_msg` VALUES ('55', '4973490000034', '18', 0x5876e98f5877a05f0038687474703a2f2f3139322e3136382e3137332e313a383038302f646174612d63656e7465722d6f70656e2f7765622f6c6f6755706c6f6164, '2016-12-30 10:35:12', '1');
 			
+	}
+
+	public DeviceDao getDeviceDao() {
+		return deviceDao;
+	}
+
+	public void setDeviceDao(DeviceDao deviceDao) {
+		this.deviceDao = deviceDao;
 	}
 }

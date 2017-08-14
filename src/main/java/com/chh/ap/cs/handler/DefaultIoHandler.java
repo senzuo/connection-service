@@ -7,6 +7,7 @@ import java.util.Map;
 import com.chh.ap.cs.client.ClientType;
 import com.chh.ap.cs.client.SessionManager;
 import com.chh.ap.cs.client.SessionMonitor;
+import com.chh.ap.cs.dao.impl.DeviceDao;
 import com.chh.ap.cs.util.Constant;
 import com.chh.ap.cs.util.cache.Cache;
 import com.chh.ap.cs.util.cache.redis.RedisStackCache;
@@ -29,7 +30,9 @@ public class DefaultIoHandler implements IoHandler {
     public static final Logger log = LoggerFactory.getLogger(DefaultIoHandler.class);
 
     public static final Logger log4Data = LoggerFactory.getLogger("log4data");
-    
+
+
+
 //    /**
 //     * Map<ClientType,Parser>
 //     */
@@ -52,6 +55,8 @@ public class DefaultIoHandler implements IoHandler {
 
     private Cache<String, Map<String, Object>> notificationCache;
 
+    private DeviceDao deviceDao;
+
 //    /**
 //     * 不同clientType的session最大空闲时长配置,单位：ms
 //     */
@@ -73,7 +78,11 @@ public class DefaultIoHandler implements IoHandler {
         //获取不到RemoteAddress，可创建时放到ioSession获取
 //    	log.info("有设备断开,IP[{}],sessionCode[{}]",ioSession.getRemoteAddress().toString(),ioSession.hashCode());
         log.info("有设备断开,sessionCode[{}]", ioSession.hashCode());
+        //更新设备状态
+        SessionManager.SessionInfo sessInfo = SessionManager.getInstance().getSessionInfo(ioSession);
+        deviceDao.updateDeviceLost(sessInfo.getSn());
         SessionManager.getInstance().delSession(ioSession);
+
     }
 
     public void sessionIdle(IoSession ioSession, IdleStatus idleStatus) throws Exception {
@@ -83,27 +92,29 @@ public class DefaultIoHandler implements IoHandler {
         //发送连接超时通知给解析
         try {
             SessionManager.SessionInfo sessInfo = SessionManager.getInstance().getSessionInfo(ioSession);
-            if (sessInfo != null&&sessInfo.getClientType()!=null) {
+            if (sessInfo != null && sessInfo.getClientType() != null) {
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("device_uid", sessInfo.getId());
-				map.put("warning_type", 17);
-				map.put("warning_value", System.currentTimeMillis());
-				map.put("warning_desc", "五分钟断链告警(内部告警,请无视)");
-				map.put("collection_time", new Date());
+                map.put("warning_type", 17);
+                map.put("warning_value", System.currentTimeMillis());
+                map.put("warning_desc", "五分钟断链告警(内部告警,请无视)");
+                map.put("collection_time", new Date());
                 ClientType clientType = sessInfo.getClientType();
                 String clientTypeName = clientType.getClientTypeName();
                 notificationCache.put(SessionMonitor.clientMapALarm.get(clientType.getType()), map);
-            }else {
+                //更新设备状态
+                deviceDao.updateDeviceLost(sessInfo.getSn());
+            } else {
                 log.warn("会话群中无法找到此会话IP[{}],sessionCode[{}]", ioSession.getRemoteAddress().toString(), ioSession.hashCode());
             }
-        } catch (Exception e){
-        	log.warn("sessionIdle抛异常了。。。",e);
+        } catch (Exception e) {
+            log.warn("sessionIdle抛异常了。。。", e);
         }
         ioSession.closeNow();
     }
 
     public void exceptionCaught(IoSession ioSession, Throwable throwable) throws Exception {
-    	//当客户端主动断开的时候 “远程主机强迫关闭了一个现有的连接。” 这里  ioSession.getRemoteAddress() 会报空指针异常
+        //当客户端主动断开的时候 “远程主机强迫关闭了一个现有的连接。” 这里  ioSession.getRemoteAddress() 会报空指针异常
         log.error("会话异常，IP[" + ioSession.getRemoteAddress().toString() + "],sessionCode[" + ioSession.hashCode() + "]", throwable);
     }
 
@@ -127,16 +138,18 @@ public class DefaultIoHandler implements IoHandler {
                 sessInfo.setClientType(clientType);
                 SessionManager.getInstance().putSession(sessInfo, ioSession);
                 //当前状态为失联状态，推送取消失联告警
-                if(sessInfo.getStatus() == 2){
-                	Map<String, Object> alarm = new HashMap<String, Object>();
-                	Date now = new Date();
-					alarm.put("device_uid", sessInfo.getId());
-		            alarm.put("warning_type", 18);
-		            alarm.put("warning_value", DateTimeUtil.toDateTimeString(now));
-		            alarm.put("warning_desc", "取消失联告警");
-		            alarm.put("collection_time", now);
-		            notificationCache.put(SessionMonitor.clientMapALarm.get(clientType.getType()),alarm);
+                if (sessInfo.getStatus() == 2) {
+                    Map<String, Object> alarm = new HashMap<String, Object>();
+                    Date now = new Date();
+                    alarm.put("device_uid", sessInfo.getId());
+                    alarm.put("warning_type", 18);
+                    alarm.put("warning_value", DateTimeUtil.toDateTimeString(now));
+                    alarm.put("warning_desc", "取消失联告警");
+                    alarm.put("collection_time", now);
+                    notificationCache.put(SessionMonitor.clientMapALarm.get(clientType.getType()), alarm);
                 }
+                //更新设备状态
+                deviceDao.updateDeviceLogin(sessInfo.getSn());
                 log.info("设备登录成功,设备ID[{}],设备类型[{}],IP[{}]", sessInfo.getId(), clientType.getClientTypeName(), ioSession.getRemoteAddress().toString());
             }
         }
@@ -230,7 +243,15 @@ public class DefaultIoHandler implements IoHandler {
         this.notificationCache = notificationCache;
     }
 
-//	public Map<Integer, Parser> getParserMap() {
+    public DeviceDao getDeviceDao() {
+        return deviceDao;
+    }
+
+    public void setDeviceDao(DeviceDao deviceDao) {
+        this.deviceDao = deviceDao;
+    }
+
+    //	public Map<Integer, Parser> getParserMap() {
 //        return parserMap;
 //    }
 //

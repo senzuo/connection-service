@@ -44,7 +44,7 @@
     <appender-ref ref="A2"/>
   </logger>
   
-  <root level="debug">
+  <root level="info">
     <appender-ref ref="ServerDailyRollingFile"/>
     <appender-ref ref="stdout"/>
   </root>

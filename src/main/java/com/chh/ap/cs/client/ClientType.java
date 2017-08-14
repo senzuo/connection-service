@@ -12,9 +12,7 @@ import com.chh.ap.cs.client.protocol.base.ProtocolHandler;
  *
  */
 public class ClientType {
-	
-	
-	
+
     /**
      * 未知
      */

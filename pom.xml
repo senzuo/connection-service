@@ -11,8 +11,8 @@
     </parent>
 
 
-    <groupId>com.tcl.paas</groupId>
-    <artifactId>paas-connction-server</artifactId>
+    <groupId>com.chh.ap</groupId>
+    <artifactId>connction-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -26,6 +26,7 @@
         <version.commons-codec>1.9</version.commons-codec>
         <version.druid>0.2.26</version.druid>
         <version.mysql>5.1.39</version.mysql>
+        <version.c3p0>0.9.1.2</version.c3p0>
     </properties>
 
     <dependencies>
@@ -87,6 +88,11 @@
         	<groupId>mysql</groupId>
         	<artifactId>mysql-connector-java</artifactId>
         	<version>${version.mysql}</version>
+        </dependency>
+        <dependency>
+            <groupId>c3p0</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>${version.c3p0}</version>
         </dependency>
     </dependencies>
 
