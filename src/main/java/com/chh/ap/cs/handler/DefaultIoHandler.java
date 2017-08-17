@@ -115,6 +115,9 @@ public class DefaultIoHandler implements IoHandler {
 
     public void exceptionCaught(IoSession ioSession, Throwable throwable) throws Exception {
         //当客户端主动断开的时候 “远程主机强迫关闭了一个现有的连接。” 这里  ioSession.getRemoteAddress() 会报空指针异常
+        if (ioSession == null) {
+            return;
+        }
         log.error("会话异常，IP[" + ioSession.getRemoteAddress().toString() + "],sessionCode[" + ioSession.hashCode() + "]", throwable);
     }
 

@@ -12,6 +12,8 @@ public class Simulator {
 
     public static void main(String[] args) {
         Device device = new HtwxOBD();
+        device.setServerIp("123.249.3.137");
+        device.setServerPort(3088);
         try {
             device.connect();
             device.sendLogin();
