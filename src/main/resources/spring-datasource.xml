@@ -20,7 +20,7 @@
     <!-- -->
     <bean id="jedisFactory" class="com.chh.ap.cs.util.cache.redis.JedisFactory" init-method="initPool"
           scope="singleton">
-        <property name="host" value="123.249.3.137"/>
+        <property name="host" value="localhost"/>
         <property name="port" value="6379"/>
         <property name="timeout" value="1000"/>
         <property name="maxWaitMills" value="10000"/>
@@ -34,9 +34,9 @@
 
     <bean id="obd" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-        <property name="jdbcUrl" value="jdbc:mysql://106.38.37.196:3306/fulr_test?characterEncoding=utf8"/>
-        <property name="user" value="obdtest"/>
-        <property name="password" value="obdtest_123"/>
+        <property name="jdbcUrl" value="jdbc:mysql://123.249.3.137:3306/obd_data_center?characterEncoding=utf8"/>
+        <property name="user" value="root"/>
+        <property name="password" value="chhRootDB123"/>
         <!--连接池中保留的最大连接数。默认值: 15 -->
         <property name="maxPoolSize" value="15"/>
         <!-- 连接池中保留的最小连接数，默认为：3-->

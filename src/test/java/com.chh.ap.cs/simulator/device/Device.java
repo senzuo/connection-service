@@ -15,12 +15,15 @@ public abstract class Device {
 
     protected Socket socket;
 
+    private  int LOGIN_DATA[];
+
     public Device() {
 
     }
 
     public void connect() throws IOException {
         socket = new Socket(serverIp, serverPort);
+        System.out.println("建立连接！+++");
     }
 
     protected void sendData(int[] data) throws IOException {

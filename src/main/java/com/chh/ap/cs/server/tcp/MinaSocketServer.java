@@ -4,7 +4,9 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 
 import com.chh.ap.cs.client.ClientType;
+import com.chh.ap.cs.handler.DefaultIoHandler;
 import com.chh.ap.cs.server.Server;
+import org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -54,7 +56,11 @@ public class MinaSocketServer implements Server {
         //第一个参数codec就是拦截器的名称，可以随便命名。
         //ProtocolCodecFilter是MINA比较常用的拦截器，作用是将二进制数据和对象之间进行转换
         //TextLineCodecFactory是MINA内置的文本消息加解码的类
-		acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaProtocolCodecFactory()));
+        DefaultIoFilterChainBuilder defaultIoHandler = acceptor.getFilterChain();
+
+		//Creates a new instance of ProtocolCodecFilter, associating a factory for the creation of the encoder and decoder.
+        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MinaProtocolCodecFactory()));
+        // 不懂
 		acceptor.getFilterChain().addLast("executor", new ExecutorFilter());
 
         //acceptor.getSessionConfig().setTcpNoDelay(true);

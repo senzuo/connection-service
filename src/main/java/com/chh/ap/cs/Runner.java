@@ -26,21 +26,36 @@ public class Runner {
 
     private static ConfigurableApplicationContext applicationContext;
 
+    /**
+     * 启动服务
+     * 1. spring 注入
+     * 2. 开启 taskMap  -> 重启服务器丢失处理 任务
+     * 3. 开启 sessionMonitor
+     * 4. 开启 serverMap -> 服务器
+     *                          OBD盒子TCP连接服务器
+     *                          推送消息服务
+     * @param args
+     */
     public static void main(String[] args) {
         log.info("Connection Server开启启动加载");
         applicationContext = SpringApplication.run(Runner.class, args);
+
         log.info("Spring注入完毕");
         //开始 断链告警丢失处理、失联告警丢失处理 监控进程
         log.info("开始启动各服务");
         WarningRemedyManager warningRemedyManager = getBean("warningRemedyManager", WarningRemedyManager.class);
         warningRemedyManager.start();
-        
-        
-        Map<String, Server> serverMap = (Map<String, Server>) applicationContext.getBean("serverMap");
-        
+
+
+        /**
+         * redis 监控session
+         */
         log.info("开始启动各服务");
         SessionMonitor sessionMonitor = getBean("sessionMonitor", SessionMonitor.class);
         sessionMonitor.start();
+
+
+        Map<String, Server> serverMap = (Map<String, Server>) applicationContext.getBean("serverMap");
         for (Map.Entry<String, Server> entry : serverMap.entrySet()) {
             String serverName = entry.getKey();
             Server server = entry.getValue();

@@ -15,6 +15,7 @@
             </map>
         </constructor-arg>
     </bean>
+
     <!-- 服务重启断链接丢失处理-->
     <bean id="warningRemedyManager" class="com.chh.ap.cs.client.WarningRemedyManager">
         <property name="taskMap">
@@ -25,7 +26,6 @@
                 <entry key="HTWX失联报警重启服务器丢失处理" value-ref="htwxMissWarningRemedyTask"/>
                 <entry key="DNA失联报警重启服务器丢失处理" value-ref="dnaMissWarningRemedyTask"/>
                 <entry key="CNLAUNCH失联报警重启服务器丢失处理" value-ref="cnlaunchMissWarningRemedyTask"/>
-
             </map>
         </property>
     </bean>
@@ -34,20 +34,20 @@
     <!--YZ断链接报警重启服务器丢失处理  -->
     <bean id="cnlaunchLostWarningRemedyTask" class="com.chh.ap.cs.client.LostWarningRemedyTask">
         <property name="clientTypeId" value="1"/>
-        <property name="sessionTime" value="300"/>
+        <property name="sessionTime" value="3000"/>
         <property name="sessionCodeMapFixCache" ref="sessionCodeMapFixCache"/>
         <property name="notificationCache" ref="notificationStackCache"/>
     </bean>
 
     <bean id="htwxlostWarningRemedyTask" class="com.chh.ap.cs.client.LostWarningRemedyTask">
         <property name="clientTypeId" value="3"/>
-        <property name="sessionTime" value="300"/>
+        <property name="sessionTime" value="3000"/>
         <property name="sessionCodeMapFixCache" ref="sessionCodeMapFixCache"/>
         <property name="notificationCache" ref="notificationStackCache"/>
     </bean>
     <bean id="dnaLostWarningRemedyTask" class="com.chh.ap.cs.client.LostWarningRemedyTask">
         <property name="clientTypeId" value="2"/>
-        <property name="sessionTime" value="180"/>
+        <property name="sessionTime" value="1800"/>
         <property name="sessionCodeMapFixCache" ref="sessionCodeMapFixCache"/>
         <property name="notificationCache" ref="notificationStackCache"/>
     </bean>
@@ -80,8 +80,8 @@
     </bean>
 
     <bean id="minaSocketServer" class="com.chh.ap.cs.server.tcp.MinaSocketServer" scope="singleton">
-        <property name="port" value="3088"/>
-        <property name="sessionTime" value="180"/>
+        <property name="port" value="3089"/>
+        <property name="sessionTime" value="1800"/>
         <property name="clientRecognizer" ref="clientRecognizer"/>
         <property name="clientTypeMap">
             <map key-type="java.lang.Integer" value-type="com.chh.ap.cs.client.ClientType">

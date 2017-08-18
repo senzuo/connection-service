@@ -12,12 +12,12 @@ public class Simulator {
 
     public static void main(String[] args) {
         Device device = new HtwxOBD();
-        device.setServerIp("123.249.3.137");
-        device.setServerPort(3088);
+//        device.setServerIp("123.249.3.137");
+//        device.setServerPort(3089);
         try {
             device.connect();
             device.sendLogin();
-            Thread.sleep(10000L);
+            Thread.sleep(1000000L);
             device.close();
         } catch (IOException e) {
             e.printStackTrace();
