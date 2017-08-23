@@ -57,7 +57,7 @@ public class MissWarningRemedyTask implements Runnable {
 					alarm.put("utctime", new Date());
 					alarm.put("alarm_type", "missing");*/
 					//alarm.put("device_uid", clientMapALarm.get(clientTypeId)+deviceUid);
-					alarm.put("device_uid", deviceUid);
+					alarm.put("device_id", deviceUid);
 		            alarm.put("warning_type", 65);
 		            alarm.put("warning_value", warningTime);
 		            alarm.put("warning_desc", "失联报警");

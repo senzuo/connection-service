@@ -53,8 +53,8 @@ public class LostWarningRemedyTask implements Runnable{
 		            map.put("alarm_type", "lost");*/
 //		            ClientType clientType = sessInfo.getClientType();
 //		            String clientTypeName = clientType.getClientTypeName();
-					//map.put("device_uid", clientTypeId+Id);
-					map.put("device_uid", Id);
+					//map.put("device_id", clientTypeId+Id);
+					map.put("device_id", Id);
 					map.put("warning_type", 17);
 					map.put("warning_value", System.currentTimeMillis());
 					map.put("warning_desc", "五分钟断链告警(内部告警,请无视)");
